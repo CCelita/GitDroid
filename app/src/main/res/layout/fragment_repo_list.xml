@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!--Pull-To-Refresh-->
+    <!--SwipeRefreshLayout-->
     <in.srain.cube.views.ptr.PtrClassicFrameLayout
         android:id="@+id/ptrClassicFrameLayout"
         android:layout_width="match_parent"
