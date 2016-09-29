@@ -3,6 +3,9 @@ package com.feicuiedu.gitdroid;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
+import com.feicuiedu.gitdroid.github.HotRepoFragment;
 import com.feicuiedu.gitdroid.login.LoginActivity;
 
 import butterknife.BindView;
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ImageView ivIcon;
 
     private ActivityUtils activityUtils;
+    private HotRepoFragment hotRepoFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 finish();
             }
         });
+
+        hotRepoFragment = new HotRepoFragment();
+        replaceFragment(hotRepoFragment);
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container,fragment);
+        fragmentTransaction.commit();
+
     }
 
     @Override
