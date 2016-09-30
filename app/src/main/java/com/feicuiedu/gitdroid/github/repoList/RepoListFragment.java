@@ -7,13 +7,21 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
+import com.feicuiedu.gitdroid.components.FooterView;
 import com.feicuiedu.gitdroid.github.Language;
 import com.feicuiedu.gitdroid.github.repoList.model.Repo;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoListView;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoLoadView;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoRefreshView;
+import com.feicuiedu.gitdroid.github.repoinfo.RepoInfoActivity;
+import com.mugen.Mugen;
+import com.mugen.MugenCallbacks;
 
 import java.util.List;
 
@@ -24,7 +32,7 @@ import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.header.StoreHouseHeader;
 
-public class RepoListFragment extends Fragment implements RepoRefreshView{
+public class RepoListFragment extends Fragment implements RepoListView {
 
     @BindView(R.id.lvRepos)
     ListView lvRepos;
@@ -41,20 +49,21 @@ public class RepoListFragment extends Fragment implements RepoRefreshView{
     private RepoListAdapter adapter;
 
     private RepoListPresenter presenter;
+    private FooterView footerView;
 
     // 提供一个创建方法，进行数据（Language）的传递。
-    public static RepoListFragment getInstance(Language language){
+    public static RepoListFragment getInstance(Language language) {
 
         RepoListFragment repoListFragment = new RepoListFragment();
 
         // Bundle 传递数据
         Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_LABGUAGE,language);
+        bundle.putSerializable(KEY_LABGUAGE, language);
         repoListFragment.setArguments(bundle);
         return repoListFragment;
     }
 
-    private Language getLanguage(){
+    private Language getLanguage() {
         return (Language) getArguments().getSerializable(KEY_LABGUAGE);
     }
 
@@ -63,7 +72,7 @@ public class RepoListFragment extends Fragment implements RepoRefreshView{
                              Bundle savedInstanceState) {
 
         View inflate = inflater.inflate(R.layout.fragment_repo_list, container, false);
-        ButterKnife.bind(this,inflate);
+        ButterKnife.bind(this, inflate);
         return inflate;
     }
 
@@ -72,14 +81,70 @@ public class RepoListFragment extends Fragment implements RepoRefreshView{
         super.onViewCreated(view, savedInstanceState);
 
         activityUtils = new ActivityUtils(this);
-        presenter = new RepoListPresenter(this,getLanguage());
+        presenter = new RepoListPresenter(this, getLanguage());
 
         adapter = new RepoListAdapter();
         lvRepos.setAdapter(adapter);
 
+        lvRepos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Repo repo = adapter.getItem(position);
+                RepoInfoActivity.open(getContext(), repo);
+            }
+        });
+
+        // 判断没有数据去自动刷新
+        if (adapter.getCount() == 0) {
+            ptrFrameLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // 自动刷新的方法
+                    ptrFrameLayout.autoRefresh();
+
+                }
+            }, 200);
+        }
+
         // 初始化下拉刷新
         initPullToPresh();
 
+        // 上拉加载的事件
+
+        /**
+         * ListView 滑动到最后一条时，再进行滑动，触发加载
+         * ListView 有一个尾部布局，显示正在加载视图
+         * 加载完成之后，尾部布局移除
+         */
+        initLoadMore();
+
+    }
+
+    private void initLoadMore() {
+
+        footerView = new FooterView(getContext());
+
+        Mugen.with(lvRepos, new MugenCallbacks() {
+
+            // 执行加载，上拉加载业务的请求
+            @Override
+            public void onLoadMore() {
+                //执行业务来进行数据加载
+                presenter.loadMore();
+            }
+
+            // 是不是正在加载
+            @Override
+            public boolean isLoading() {
+                return footerView.isLoading() && lvRepos.getFooterViewsCount() > 0;
+            }
+
+            // 是不是加载完了所有的数据
+            @Override
+            public boolean hasLoadedAllItems() {
+                return footerView.isComplete() && lvRepos.getFooterViewsCount() > 0;
+            }
+        }).start();
     }
 
     private void initPullToPresh() {
@@ -93,7 +158,7 @@ public class RepoListFragment extends Fragment implements RepoRefreshView{
         // 更改头布局
         StoreHouseHeader header = new StoreHouseHeader(getContext());
         header.initWithString("I LIKE ANDROID");
-        header.setPadding(0,60,0,60);
+        header.setPadding(0, 60, 0, 60);
         ptrFrameLayout.setHeaderView(header);
         ptrFrameLayout.addPtrUIHandler(header);
 
@@ -150,5 +215,33 @@ public class RepoListFragment extends Fragment implements RepoRefreshView{
         ptrFrameLayout.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
         errorView.setVisibility(View.VISIBLE);
+    }
+
+    //--------------------加载的视图实现-----------------------------
+    @Override
+    public void showLoadingView() {
+        if (lvRepos.getFooterViewsCount() == 0) {
+            lvRepos.addFooterView(footerView);
+        }
+        footerView.showLoading();
+    }
+
+    @Override
+    public void hideLoadView() {
+        lvRepos.removeFooterView(footerView);
+    }
+
+    @Override
+    public void showLoadError() {
+        if (lvRepos.getFooterViewsCount() == 0) {
+            lvRepos.addFooterView(footerView);
+        }
+        footerView.showError();
+    }
+
+    @Override
+    public void addLoadData(List<Repo> list) {
+        adapter.addAll(list);
+        adapter.notifyDataSetChanged();
     }
 }

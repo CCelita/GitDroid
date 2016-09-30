@@ -1,4 +1,4 @@
-package com.feicuiedu.gitdroid.github.repoList;
+package com.feicuiedu.gitdroid.github.repoList.view;
 
 import com.feicuiedu.gitdroid.github.repoList.model.Repo;
 

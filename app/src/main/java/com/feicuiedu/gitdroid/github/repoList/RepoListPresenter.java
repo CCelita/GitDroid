@@ -3,6 +3,9 @@ package com.feicuiedu.gitdroid.github.repoList;
 import com.feicuiedu.gitdroid.github.Language;
 import com.feicuiedu.gitdroid.github.repoList.model.Repo;
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoListView;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoLoadView;
+import com.feicuiedu.gitdroid.github.repoList.view.RepoRefreshView;
 import com.feicuiedu.gitdroid.network.GithubClient;
 
 import java.util.List;
@@ -19,22 +22,72 @@ import retrofit2.Response;
 public class RepoListPresenter {
     private Language language;
     private int nextPage = 1;
-    private RepoRefreshView refreshView;
+    private RepoListView repoView;
 
-    public RepoListPresenter(RepoRefreshView refreshView,Language language) {
-        this.refreshView = refreshView;
+    public RepoListPresenter(RepoListView repoView,Language language) {
+        this.repoView = repoView;
         this.language = language;
     }
 
+    // 刷新的业务
     public void refresh(){
-
         // 显示刷新视图
-        refreshView.showContentView();
-
+        repoView.showContentView();
         nextPage = 1;
         Call<RepoResult> refreshCall = GithubClient.getInstance().searchRepos("language:" + language.getPath(), nextPage);
         refreshCall.enqueue(refreshCallback);
     }
+
+    // 加载的业务
+    public void loadMore(){
+
+        repoView.showLoadingView();
+
+        Call<RepoResult> refreshCall = GithubClient.getInstance().searchRepos("language:" + language.getPath(), nextPage);
+        refreshCall.enqueue(LoadMoreCallback);
+    }
+
+    private Callback<RepoResult> LoadMoreCallback = new Callback<RepoResult>() {
+
+        // 响应成功
+        @Override
+        public void onResponse(Call<RepoResult> call, Response<RepoResult> response) {
+
+            repoView.hideLoadView();
+
+            if (response.isSuccessful()){
+
+                RepoResult result = response.body();
+
+                // 如果为空
+                if (result==null){
+                    repoView.showLoadError();
+                    return;
+                }
+
+                // 结果不为空
+                if (result.getTotalCount()<=0){
+                    // 里面的仓库数据是空的
+                    repoView.showMessage("没有更多数据");
+                    return;
+                }
+
+                List<Repo> repoList = result.getRepoList();
+                if (repoList!=null){
+                    // 设置加载出来的数据
+                    repoView.addLoadData(repoList);
+                    nextPage++;
+                }
+            }
+        }
+
+        // 失败
+        @Override
+        public void onFailure(Call<RepoResult> call, Throwable t) {
+            repoView.hideLoadView();
+            repoView.showMessage("响应失败"+t.getMessage());
+        }
+    };
 
     private Callback<RepoResult> refreshCallback = new Callback<RepoResult>() {
 
@@ -42,7 +95,7 @@ public class RepoListPresenter {
         @Override
         public void onResponse(Call<RepoResult> call, Response<RepoResult> response) {
             // 停止刷新
-            refreshView.stopRefresh();
+            repoView.stopRefresh();
 
             // 响应成功
             if (response.isSuccessful()){
@@ -50,32 +103,32 @@ public class RepoListPresenter {
 
                 // 判断数据是不是空的
                 if (repoResult==null){
-                    refreshView.showEmptyView();
+                    repoView.showEmptyView();
                     return;
                 }
 
                 if (repoResult.getTotalCount()<=0){
-                    refreshView.showEmptyView();
-                    refreshView.refreshData(null);
+                    repoView.showEmptyView();
+                    repoView.refreshData(null);
                     return;
                 }
                 // 有数据，设置数据
                 List<Repo> repoList = repoResult.getRepoList();
                 if (repoList!=null){
-                    refreshView.refreshData(repoList);// 设置刷新的数据
+                    repoView.refreshData(repoList);// 设置刷新的数据
                     // 下拉刷新完之后，第一页数据请求完成，下次上拉加载，从第二页开始
                     nextPage = 2;
                     return;
                 }
             }
-            refreshView.showErrorView();
+            repoView.showErrorView();
         }
 
         // 失败
         @Override
         public void onFailure(Call<RepoResult> call, Throwable t) {
-            refreshView.stopRefresh();
-            refreshView.showMessage("请求失败"+t.getMessage());
+            repoView.stopRefresh();
+            repoView.showMessage("请求失败"+t.getMessage());
         }
     };
 }
