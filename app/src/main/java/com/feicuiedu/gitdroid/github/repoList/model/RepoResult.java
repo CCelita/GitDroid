@@ -4,10 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * 作者：yuanchao on 2016/8/29 0029 10:52
- * 邮箱：yuanchao@feicuiedu.com
- */
 public class RepoResult {
 
     /**

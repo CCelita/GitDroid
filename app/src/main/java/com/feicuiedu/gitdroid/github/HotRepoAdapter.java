@@ -23,7 +23,9 @@ public class HotRepoAdapter extends FragmentPagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        return new RepoListFragment();
+
+        // 将不同的语言传递到仓库列表页面
+        return RepoListFragment.getInstance(list.get(position));
     }
 
     @Override

@@ -14,8 +14,6 @@ import butterknife.ButterKnife;
 
 /**
  * 创建的ListView的尾部布局，主要实现加载的视图实现
- * 作者：yuanchao on 2016/8/25 0025 10:20
- * 邮箱：yuanchao@feicuiedu.com
  */
 public class FooterView extends FrameLayout {
 

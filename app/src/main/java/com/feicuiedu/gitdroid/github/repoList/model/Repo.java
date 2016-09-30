@@ -5,10 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-/**
- * 作者：yuanchao on 2016/8/29 0029 10:55
- * 邮箱：yuanchao@feicuiedu.com
- */
 public class Repo implements Serializable{
     /**
      * {
