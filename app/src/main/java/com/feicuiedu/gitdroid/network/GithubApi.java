@@ -2,6 +2,7 @@ package com.feicuiedu.gitdroid.network;
 
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
+import com.feicuiedu.gitdroid.login.model.AccessToken;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -27,7 +28,7 @@ public interface GithubApi {
     String AUTH_SCOPE = "user,public_repo,repo";
 
     // 登录页面的网址（WebView来进行访问）
-    String AUTH_URL = "https://github.com/login/oauth/authorize?client_id"+CLIENT_ID+"&scope="+AUTH_SCOPE;
+    String AUTH_URL = "https://github.com/login/oauth/authorize?client_id="+CLIENT_ID+"&scope="+AUTH_SCOPE;
 
 
     /**
@@ -61,6 +62,22 @@ public interface GithubApi {
     @POST("/markdown/raw")
     Call<ResponseBody> markDown(@Body RequestBody body);
 
+
+    /**
+     * 获取访问令牌，根据code来获取
+     *
+     * @param clientId
+     * @param ClientSecret
+     * @param code
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("https://github.com/login/oauth/access_token")
+    @Headers("Accept: application/json")
+    Call<AccessToken> getOAuthToken(
+            @Field("client_id")String clientId,
+            @Field("client_secret")String ClientSecret,
+            @Field("code")String code);
 
 
 }

@@ -1,5 +1,6 @@
 package com.feicuiedu.gitdroid.login;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -8,6 +9,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.R;
 import com.feicuiedu.gitdroid.network.GithubApi;
@@ -59,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         // 设置WebView的进度监听，加载完成之前显示动画，完成之后，动画隐藏
         webView.setWebChromeClient(webChormeClkient);
 
-        //
+        // 监听WebView的页面刷新
         webView.setWebViewClient(webViewClient);
 
     }
@@ -67,6 +69,13 @@ public class LoginActivity extends AppCompatActivity {
     private WebViewClient webViewClient = new WebViewClient(){
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Uri uri = Uri.parse(url);
+            if (GithubApi.CALL_BACK.equals(uri.getScheme())){
+                String code = uri.getQueryParameter("code");
+                Toast.makeText(LoginActivity.this, "code:"+code, Toast.LENGTH_SHORT).show();
+                //TODO code拿到之后，利用code来进行token的获取
+                new LoginPresenter().login(code);
+            }
 
             return super.shouldOverrideUrlLoading(view, url);
         }
