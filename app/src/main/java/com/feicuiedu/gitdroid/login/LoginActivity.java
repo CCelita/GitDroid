@@ -11,14 +11,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.feicuiedu.gitdroid.MainActivity;
 import com.feicuiedu.gitdroid.R;
+import com.feicuiedu.gitdroid.commons.ActivityUtils;
 import com.feicuiedu.gitdroid.network.GithubApi;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements LoginView{
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -26,6 +28,10 @@ public class LoginActivity extends AppCompatActivity {
     WebView webView;
     @BindView(R.id.gifImageView)
     GifImageView gifImageView;
+
+    private ActivityUtils activityUtils;
+
+    private LoginPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onContentChanged() {
         super.onContentChanged();
         ButterKnife.bind(this);
+        presenter = new LoginPresenter(this);
+        activityUtils = new ActivityUtils(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -71,10 +79,11 @@ public class LoginActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Uri uri = Uri.parse(url);
             if (GithubApi.CALL_BACK.equals(uri.getScheme())){
+
                 String code = uri.getQueryParameter("code");
-                Toast.makeText(LoginActivity.this, "code:"+code, Toast.LENGTH_SHORT).show();
-                //TODO code拿到之后，利用code来进行token的获取
-                new LoginPresenter().login(code);
+                presenter.login(code);
+
+                return true;
             }
 
             return super.shouldOverrideUrlLoading(view, url);
@@ -91,4 +100,25 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
+
+    @Override
+    public void showMessage(String msg) {
+        activityUtils.showToast(msg);
+    }
+
+    @Override
+    public void showProgress() {
+        gifImageView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void resetWebView() {
+        initWebView();
+    }
+
+    @Override
+    public void navigationToMain() {
+        activityUtils.startActivity(MainActivity.class);
+        finish();
+    }
 }

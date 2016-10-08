@@ -3,6 +3,7 @@ package com.feicuiedu.gitdroid.network;
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
 import com.feicuiedu.gitdroid.login.model.AccessToken;
+import com.feicuiedu.gitdroid.login.model.User;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -78,6 +79,9 @@ public interface GithubApi {
             @Field("client_id")String clientId,
             @Field("client_secret")String ClientSecret,
             @Field("code")String code);
+
+    @GET("/user")
+    Call<User> getUser();
 
 
 }

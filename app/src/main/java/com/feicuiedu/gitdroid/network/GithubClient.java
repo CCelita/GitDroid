@@ -4,6 +4,7 @@ import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
 import com.feicuiedu.gitdroid.login.TokenInterceptor;
 import com.feicuiedu.gitdroid.login.model.AccessToken;
+import com.feicuiedu.gitdroid.login.model.User;
 
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -68,5 +69,10 @@ public class GithubClient implements GithubApi{
     @Override
     public Call<AccessToken> getOAuthToken(@Field("client_id") String clientId, @Field("client_secret") String ClientSecret, @Field("code") String code) {
         return githubApi.getOAuthToken(clientId, ClientSecret, code);
+    }
+
+    @Override
+    public Call<User> getUser() {
+        return githubApi.getUser();
     }
 }

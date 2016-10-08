@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import com.feicuiedu.gitdroid.commons.ActivityUtils;
 import com.feicuiedu.gitdroid.github.HotRepoFragment;
 import com.feicuiedu.gitdroid.login.LoginActivity;
+import com.feicuiedu.gitdroid.login.model.UserRepo;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,12 +73,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         replaceFragment(hotRepoFragment);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (UserRepo.isEmpty()){
+            btnLogin.setText(R.string.login_github);
+            return;
+        }
+        // 切换账号按钮
+        btnLogin.setText(R.string.switch_account);
+        //Main页面的标题
+        getSupportActionBar().setTitle(UserRepo.getUser().getName());
+        // 设置头像
+        ImageLoader.getInstance().displayImage(UserRepo.getUser().getAvatar(),ivIcon);
+    }
+
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.container,fragment);
         fragmentTransaction.commit();
-
     }
 
     @Override
