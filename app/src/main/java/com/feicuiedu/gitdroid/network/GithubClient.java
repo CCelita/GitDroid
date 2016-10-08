@@ -2,6 +2,7 @@ package com.feicuiedu.gitdroid.network;
 
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
+import com.feicuiedu.gitdroid.login.TokenInterceptor;
 import com.feicuiedu.gitdroid.login.model.AccessToken;
 
 import okhttp3.OkHttpClient;
@@ -35,6 +36,7 @@ public class GithubClient implements GithubApi{
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
+                .addInterceptor(new TokenInterceptor())
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()

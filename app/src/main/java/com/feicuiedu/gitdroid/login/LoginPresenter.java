@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.feicuiedu.gitdroid.login.model.AccessToken;
+import com.feicuiedu.gitdroid.login.model.UserRepo;
 import com.feicuiedu.gitdroid.network.GithubApi;
 import com.feicuiedu.gitdroid.network.GithubClient;
 
@@ -50,6 +51,7 @@ public class LoginPresenter {
 
                 Log.w("TAG","token 的值："+token);
 
+                UserRepo.setAccessToken(token);
 
 
             }
