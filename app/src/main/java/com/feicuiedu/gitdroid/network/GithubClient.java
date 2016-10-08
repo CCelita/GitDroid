@@ -33,7 +33,6 @@ public class GithubClient implements GithubApi{
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                //添加Token拦截器
                 .addInterceptor(interceptor)
                 .build();
 

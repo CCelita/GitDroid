@@ -17,6 +17,19 @@ import retrofit2.http.Query;
 
 public interface GithubApi {
 
+    // Github 申请授权登录的信息
+    public String CLIENT_ID = "a764de00ce4cdd8ed746";
+    public String CLIENT_SECRET = "b5a3d14efb593ec0b5ca085c313f8d19270a241e";
+
+    // 申请填写的标志（重定向标志）
+    public String CALL_BACK = "feicuiedu";
+
+    String AUTH_SCOPE = "user,public_repo,repo";
+
+    // 登录页面的网址（WebView来进行访问）
+    String AUTH_URL = "https://github.com/login/oauth/authorize?client_id"+CLIENT_ID+"&scope="+AUTH_SCOPE;
+
+
     /**
      * 获取仓库列表的请求Api
      *
@@ -47,6 +60,7 @@ public interface GithubApi {
     @Headers({"Content-Type:text/plain"})
     @POST("/markdown/raw")
     Call<ResponseBody> markDown(@Body RequestBody body);
+
 
 
 }
