@@ -1,5 +1,6 @@
 package com.feicuiedu.gitdroid.network;
 
+import com.feicuiedu.gitdroid.github.hotuser.HotUserResult;
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
 import com.feicuiedu.gitdroid.login.TokenInterceptor;
@@ -74,5 +75,10 @@ public class GithubClient implements GithubApi{
     @Override
     public Call<User> getUser() {
         return githubApi.getUser();
+    }
+
+    @Override
+    public Call<HotUserResult> searchUsers(@Query("q") String query, @Query("page") int pageId) {
+        return githubApi.searchUsers(query, pageId);
     }
 }

@@ -1,5 +1,6 @@
 package com.feicuiedu.gitdroid.network;
 
+import com.feicuiedu.gitdroid.github.hotuser.HotUserResult;
 import com.feicuiedu.gitdroid.github.repoList.model.RepoResult;
 import com.feicuiedu.gitdroid.github.repoinfo.RepoContentResult;
 import com.feicuiedu.gitdroid.login.model.AccessToken;
@@ -82,6 +83,15 @@ public interface GithubApi {
 
     @GET("/user")
     Call<User> getUser();
+
+    /**
+     * 获取热门开发者
+     * @param query  查询条件
+     * @param pageId 查询页数
+     * @return
+     */
+    @GET("/search/users")
+    Call<HotUserResult> searchUsers(@Query("q")String query, @Query("page")int pageId);
 
 
 }
