@@ -55,7 +55,6 @@ public class RepoListFragment extends Fragment implements RepoListView {
     public static RepoListFragment getInstance(Language language) {
 
         RepoListFragment repoListFragment = new RepoListFragment();
-
         // Bundle 传递数据
         Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_LABGUAGE, language);
@@ -72,6 +71,10 @@ public class RepoListFragment extends Fragment implements RepoListView {
                              Bundle savedInstanceState) {
 
         View inflate = inflater.inflate(R.layout.fragment_repo_list, container, false);
+
+        activityUtils = new ActivityUtils(this);
+        presenter = new RepoListPresenter(this, getLanguage());
+
         ButterKnife.bind(this, inflate);
         return inflate;
     }
@@ -79,9 +82,6 @@ public class RepoListFragment extends Fragment implements RepoListView {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        activityUtils = new ActivityUtils(this);
-        presenter = new RepoListPresenter(this, getLanguage());
 
         adapter = new RepoListAdapter();
         lvRepos.setAdapter(adapter);

@@ -1,7 +1,6 @@
 package com.feicuiedu.gitdroid;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,76 +31,81 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.navigationView)
-    NavigationView navigationView;
     @BindView(R.id.drawerLayout)
-    DrawerLayout drawerLayout;
+    DrawerLayout drawerLayout; // 抽屉(包含内容+侧滑菜单)
+    @BindView(R.id.navigationView)
+    NavigationView navigationView; // 侧滑菜单视图
+
+    // 热门仓库Fragment
+    private HotRepoFragment hotRepoFragment;
+    private HotUserFragment hotUserFragment;
+    private FavoriteFragment favoriteFragment;
+    private GankFragment gankFragment;
+
     private Button btnLogin;
     private ImageView ivIcon;
 
     private ActivityUtils activityUtils;
 
 
-    private HotRepoFragment hotRepoFragment;
-    private HotUserFragment hotUserFragment;
-    private FavoriteFragment favoriteFragment;
-    private GankFragment gankFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 会触发onContentChanged方法
+
+        // 设置当前视图(也就是说，更改了当前视图内容,将导至onContentChanged方法触发)
         setContentView(R.layout.activity_main);
     }
 
-    @Override
-    public void onContentChanged() {
+    @Override public void onContentChanged() {
         super.onContentChanged();
         ButterKnife.bind(this);
         activityUtils = new ActivityUtils(this);
-
-        // 处理toolbar作为ActionBar
+        // ActionBar处理
         setSupportActionBar(toolbar);
-
+        // 设置navigationView的监听器
         navigationView.setNavigationItemSelectedListener(this);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        toggle.syncState();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(// 构建抽屉的监听
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.syncState();// 根据drawerlayout同步其当前状态
+        // 设置抽屉监听
         drawerLayout.addDrawerListener(toggle);
 
+        //得到NavigationView里面的头布局的控件
         btnLogin = ButterKnife.findById(navigationView.getHeaderView(0), R.id.btnLogin);
         ivIcon = ButterKnife.findById(navigationView.getHeaderView(0), R.id.ivIcon);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            @Override public void onClick(View v) {
                 activityUtils.startActivity(LoginActivity.class);
                 finish();
             }
         });
 
+        // 默认显示的是热门仓库fragment
         hotRepoFragment = new HotRepoFragment();
         replaceFragment(hotRepoFragment);
     }
 
-    @Override
-    protected void onStart() {
+    //主要做了我们基本登录信息的改变
+    @Override protected void onStart() {
         super.onStart();
         if (UserRepo.isEmpty()){
             btnLogin.setText(R.string.login_github);
             return;
         }
-        // 切换账号按钮
         btnLogin.setText(R.string.switch_account);
-        //Main页面的标题
+        //设置Main页面的标题
         getSupportActionBar().setTitle(UserRepo.getUser().getName());
-        // 设置头像
+        //设置我们的用户头像
+//        Picasso.with(this).load(UserRepo.getUser().getAvatar()).into(ivIcon);
         ImageLoader.getInstance().displayImage(UserRepo.getUser().getAvatar(),ivIcon);
     }
 
-    private void replaceFragment(Fragment fragment){
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.container,fragment);
-        fragmentTransaction.commit();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.commit();
     }
 
     // 侧滑菜单监听器
@@ -150,5 +154,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // 返回true，代表将该菜单项变为checked状态
         return true;
+    }
+
+    @Override public void onBackPressed() {
+        super.onBackPressed();
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
     }
 }

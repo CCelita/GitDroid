@@ -104,6 +104,7 @@ public class GankFragment extends Fragment implements GankPresenter.GankView{
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             calendar.set(year,monthOfYear,dayOfMonth);
             date = calendar.getTime();
+
             tvDate.setText(simpleDateFormat.format(date));
             //更新了日期，重新执行业务，重载加载数据
             gankPresenter.getGanks(date);

@@ -34,7 +34,7 @@ public class HotRepoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        HotRepoAdapter adapter = new HotRepoAdapter(getFragmentManager(),getContext());
+        HotRepoAdapter adapter = new HotRepoAdapter(getChildFragmentManager(),getContext());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
     }
